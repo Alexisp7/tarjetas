@@ -38,6 +38,16 @@ function textoPlano(html) {
   return d.textContent.replace(/\s+/g, ' ').trim();
 }
 
+/** Número fijo a partir de un texto: sirve para barajar siempre igual. */
+function hashTexto(texto) {
+  let h = 2166136261;
+  for (const c of texto) {
+    h ^= c.codePointAt(0);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
 function hoy(t = Date.now()) {
   const local = t - new Date(t).getTimezoneOffset() * MIN;
   return Math.floor((local - CAMBIO_DE_DIA * 60 * MIN) / DIA);
@@ -127,15 +137,21 @@ function clasificar(mazo) {
   const vence = (t) => estado.tarjetas[t.id].vence;
   r.aprender.sort((a, b) => vence(a) - vence(b));
   r.futuras.sort((a, b) => vence(a) - vence(b));
-  r.repasar.sort((a, b) => estado.tarjetas[a.id].dia - estado.tarjetas[b.id].dia);
+  // Repasos: primero los más atrasados; los del mismo día, en un orden distinto cada día
+  const mezcla = (t) => hashTexto(t.id + dia);
+  r.repasar.sort((a, b) => (estado.tarjetas[a.id].dia - estado.tarjetas[b.id].dia) || (mezcla(a) - mezcla(b)));
   return r;
 }
 
 function siguienteTarjeta(mazo) {
   const r = clasificar(mazo);
   if (r.aprender.length) return r.aprender[0];
-  if (r.repasar.length) return r.repasar[0];
-  if (r.nuevas.length) return r.nuevas[0];
+  // Intercala nuevas y repasos de forma proporcional, como Anki
+  const pendientes = r.nuevas.length + r.repasar.length;
+  if (pendientes) {
+    const tocaNueva = Math.random() < r.nuevas.length / pendientes;
+    return (tocaNueva ? r.nuevas[0] : r.repasar[0]) ?? r.nuevas[0];
+  }
   const pronto = r.futuras[0];
   if (pronto && estado.tarjetas[pronto.id].vence - Date.now() <= ADELANTAR) return pronto;
   return null;
@@ -241,10 +257,10 @@ function botonAudio(frase, voz) {
   return `<button type="button" class="audio" data-accion="audio" data-frase="${esc(frase)}" data-voz="${esc(voz)}" aria-label="Escuchar">${ICONO.audio}</button>`;
 }
 
-function hablar(frase, voz) {
+function hablar(frase, voz, encolar = false) {
   if (!('speechSynthesis' in window) || !frase) return;
   const idioma = voz.replace('_', '-').toLowerCase();
-  speechSynthesis.cancel();
+  if (!encolar) speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(frase);
   u.lang = idioma;
   u.rate = 0.95;
@@ -335,8 +351,8 @@ function pantallaTarjeta() {
 function mostrarRespuesta() {
   estudio.dorso = true;
   pantallaTarjeta();
-  const audio = $app.querySelector('.audio');
-  if (estado.ajustes.audio && audio) hablar(audio.dataset.frase, audio.dataset.voz);
+  if (!estado.ajustes.audio) return;
+  $app.querySelectorAll('.audio').forEach((audio, i) => hablar(audio.dataset.frase, audio.dataset.voz, i > 0));
 }
 
 function responder(boton) {

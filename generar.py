@@ -30,27 +30,32 @@ CSS = (RAIZ / "estilo.css").read_text(encoding="utf-8")
 # archivo CSV -> (tipo de nota, instrucción que aparece en la tarjeta)
 TIPOS = {
     "vocabulario.csv": ("concepto", None),
+    "palabras.csv": ("palabra", None),
     "completar.csv": ("completar", None),
     "elegir.csv": ("pregunta", "Elige la opción correcta"),
     "traducir.csv": ("pregunta", "Tradúcelo al {idioma}"),
     "transformar.csv": ("pregunta", "Reescríbelo usando la palabra indicada"),
+    "ordenar.csv": ("pregunta", "Ordena las palabras"),
     "errores.csv": ("pregunta", "Encuentra y corrige el error"),
 }
 
 # Columnas de cada tipo. "etiquetas" es opcional en todos.
 COLUMNAS = {
     "concepto": ["termino", "uso", "significado", "ejemplo", "traduccion", "nota"],
+    "palabra": ["palabra", "tipo", "significado", "ejemplo", "traduccion", "nota"],
     "completar": ["oracion", "pista", "traduccion", "explicacion"],
     "pregunta": ["pregunta", "pista", "respuesta", "explicacion"],
 }
 # Columnas que identifican cada nota: si las cambias, Anki la importará como nota nueva.
 CLAVE = {
     "concepto": ["termino", "uso"],
+    "palabra": ["palabra", "tipo"],
     "completar": ["oracion"],
     "pregunta": ["pregunta"],
 }
 OBLIGATORIAS = {
     "concepto": {"termino", "ejemplo"},
+    "palabra": {"palabra", "significado"},
     "completar": {"oracion"},
     "pregunta": {"pregunta", "respuesta"},
 }
@@ -95,6 +100,44 @@ CONCEPTO_PRODUCIR_DORSO = """<div class="wrap">
 {{tts VOZ:Ejemplo}}
 </div>"""
 
+PALABRA_RECONOCER_FRENTE = """<div class="wrap">
+<div class="tipo">¿Qué significa?</div>
+<div class="termino">{{Palabra}}</div>
+{{#Tipo}}<div class="pista">{{Tipo}}</div>{{/Tipo}}
+{{#Ejemplo}}<div class="ejemplo">{{Ejemplo}}</div>{{/Ejemplo}}
+</div>"""
+
+PALABRA_RECONOCER_DORSO = """<div class="wrap">
+<div class="tipo">¿Qué significa?</div>
+<div class="termino">{{Palabra}}</div>
+{{#Tipo}}<div class="pista">{{Tipo}}</div>{{/Tipo}}
+{{#Ejemplo}}<div class="ejemplo">{{Ejemplo}}</div>{{/Ejemplo}}
+<hr id="answer">
+<div class="uso">{{Significado}}</div>
+{{#Traduccion}}<div class="trad">{{Traduccion}}</div>{{/Traduccion}}
+{{#Nota}}<div class="nota">{{Nota}}</div>{{/Nota}}
+{{tts VOZ:Palabra}} {{#Ejemplo}}{{tts VOZ:Ejemplo}}{{/Ejemplo}}
+</div>"""
+
+PALABRA_PRODUCIR_FRENTE = """<div class="wrap">
+<div class="tipo">¿Cómo se dice?</div>
+<div class="uso">{{Significado}}</div>
+{{#Tipo}}<div class="pista">{{Tipo}}</div>{{/Tipo}}
+{{#Traduccion}}<div class="trad">{{Traduccion}}</div>{{/Traduccion}}
+</div>"""
+
+PALABRA_PRODUCIR_DORSO = """<div class="wrap">
+<div class="tipo">¿Cómo se dice?</div>
+<div class="uso">{{Significado}}</div>
+{{#Tipo}}<div class="pista">{{Tipo}}</div>{{/Tipo}}
+{{#Traduccion}}<div class="trad">{{Traduccion}}</div>{{/Traduccion}}
+<hr id="answer">
+<div class="termino">{{Palabra}}</div>
+{{#Ejemplo}}<div class="ejemplo">{{Ejemplo}}</div>{{/Ejemplo}}
+{{#Nota}}<div class="nota">{{Nota}}</div>{{/Nota}}
+{{tts VOZ:Palabra}} {{#Ejemplo}}{{tts VOZ:Ejemplo}}{{/Ejemplo}}
+</div>"""
+
 COMPLETAR_FRENTE = """<div class="wrap">
 <div class="tipo">Completa</div>
 <div class="en">{{cloze:Texto}}</div>
@@ -135,6 +178,15 @@ MODELOS = {
         "plantillas": [
             {"nombre": "Reconocer", "frente": CONCEPTO_RECONOCER_FRENTE, "dorso": CONCEPTO_RECONOCER_DORSO},
             {"nombre": "Producir", "frente": CONCEPTO_PRODUCIR_FRENTE, "dorso": CONCEPTO_PRODUCIR_DORSO},
+        ],
+        "cloze": False,
+    },
+    "palabra": {
+        "nombre": "Idiomas - Palabra",
+        "campos": ["Palabra", "Tipo", "Significado", "Ejemplo", "Traduccion", "Nota"],
+        "plantillas": [
+            {"nombre": "Reconocer", "frente": PALABRA_RECONOCER_FRENTE, "dorso": PALABRA_RECONOCER_DORSO},
+            {"nombre": "Producir", "frente": PALABRA_PRODUCIR_FRENTE, "dorso": PALABRA_PRODUCIR_DORSO},
         ],
         "cloze": False,
     },
@@ -194,6 +246,8 @@ def campos(tipo, fila, instruccion):
     c = {k: markdown(fila.get(k, "")) for k in COLUMNAS[tipo]}
     if tipo == "concepto":
         return [c["termino"], c["uso"], c["significado"], c["ejemplo"], c["traduccion"], c["nota"]]
+    if tipo == "palabra":
+        return [c["palabra"], c["tipo"], c["significado"], c["ejemplo"], c["traduccion"], c["nota"]]
     if tipo == "completar":
         return [a_cloze(c["oracion"]), c["pista"], c["traduccion"], c["explicacion"]]
     return [instruccion, c["pregunta"], chips(c["pista"]), c["respuesta"], c["explicacion"]]
@@ -250,6 +304,9 @@ def leer_bloque(carpeta):
                 notas.append({"id": guid, "modelo": tipo, "campos": valores, "etiquetas": etiquetas})
                 n += 1
         resumen.append(f"  {archivo:<18} {n:>3} notas")
+    # Baraja las notas para no estudiar seguidas las del mismo tipo o tema.
+    # El orden depende solo del ID: las notas nuevas se intercalan sin mover las demás.
+    notas.sort(key=lambda nota: hashlib.md5(nota["id"].encode("utf-8")).hexdigest())
     return {"id": relativa, "info": info, "notas": notas, "resumen": resumen}
 
 

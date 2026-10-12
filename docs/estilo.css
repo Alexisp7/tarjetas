@@ -49,6 +49,7 @@
 .es { font-size: 19px; margin-top: 4px; }
 .trad { font-size: 18px; font-style: italic; color: var(--suave); margin-top: 8px; }
 .pista { font-size: 16px; color: var(--suave); margin-top: 10px; }
+.ejemplo { font-size: 20px; margin-top: 14px; }
 
 .chips { margin-top: 14px; }
 .chip {

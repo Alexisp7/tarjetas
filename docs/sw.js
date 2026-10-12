@@ -1,6 +1,6 @@
 // Guarda la app en el dispositivo para que funcione sin internet.
 // Siempre intenta descargar la última versión; si no hay conexión, usa la guardada.
-const CACHE = 'tarjetas-v1';
+const CACHE = 'tarjetas-v2';
 const ARCHIVOS = [
   './', 'index.html', 'app.css', 'app.js', 'estilo.css', 'mazos.json',
   'manifest.webmanifest', 'icono-180.png', 'icono-192.png', 'icono-512.png',
@@ -20,7 +20,7 @@ self.addEventListener('activate', (e) => {
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET' || new URL(e.request.url).origin !== location.origin) return;
   e.respondWith(
-    fetch(e.request)
+    fetch(e.request, { cache: 'no-cache' })
       .then((resp) => {
         if (resp.ok) {
           const copia = resp.clone();
