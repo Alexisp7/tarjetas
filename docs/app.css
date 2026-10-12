@@ -1,0 +1,250 @@
+/* Interfaz de la app. Las tarjetas usan estilo.css, igual que en Anki. */
+:root {
+  --fondo: #fafaf7;
+  --panel: #ffffff;
+  --texto: #1f2328;
+  --suave: #6b7280;
+  --linea: #e4e4de;
+  --azul: #2563eb;
+  --rojo: #dc2626;
+  --naranja: #c2410c;
+  --verde: #15803d;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #1e1f22;
+    --panel: #26272b;
+    --texto: #e6e6e6;
+    --suave: #9aa0a6;
+    --linea: #36373c;
+    --azul: #7aa2ff;
+    --rojo: #f87171;
+    --naranja: #fb923c;
+    --verde: #4ade80;
+  }
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  background: var(--fondo);
+  color: var(--texto);
+}
+
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  overscroll-behavior: none;
+}
+
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+}
+
+button { font: inherit; color: inherit; cursor: pointer; }
+button:disabled { opacity: .3; cursor: default; }
+
+/* ---------- barra superior */
+.barra {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 52px;
+  padding: 6px 8px 6px 16px;
+  border-bottom: 1px solid var(--linea);
+}
+.barra .icono:first-child { margin-left: -10px; }
+.barra h1 {
+  flex: 1;
+  margin: 0;
+  font-size: 18px;
+  font-weight: 650;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.icono {
+  display: inline-flex;
+  padding: 8px;
+  border: none;
+  border-radius: 10px;
+  background: none;
+  color: var(--azul);
+}
+.icono svg { width: 24px; height: 24px; }
+
+.contenido { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.lista { max-width: 640px; margin: 0 auto; padding: 16px; }
+
+/* ---------- lista de mazos */
+.mazo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 10px;
+  padding: 14px 16px;
+  text-align: left;
+  background: var(--panel);
+  border: 1px solid var(--linea);
+  border-radius: 14px;
+}
+.mazo:active { transform: scale(.99); }
+.mazo-texto { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.grupo { font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); }
+.nombre { font-size: 18px; font-weight: 600; }
+
+.cuentas { display: flex; gap: 10px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.n-nuevas { color: var(--azul); }
+.n-aprender { color: var(--rojo); }
+.n-repasar { color: var(--verde); }
+.cero { opacity: .3; }
+
+.leyenda, .resumen-dia, .ayuda, .vacio { font-size: 14px; color: var(--suave); }
+.leyenda { text-align: center; margin-top: 16px; }
+.resumen-dia { text-align: center; }
+
+.consejo {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  font-size: 15px;
+  line-height: 1.4;
+  background: var(--panel);
+  border: 1px dashed var(--azul);
+  border-radius: 12px;
+}
+.consejo svg { width: 18px; height: 18px; vertical-align: -3px; color: var(--azul); }
+
+/* ---------- estudio */
+.area-tarjeta { display: flex; flex-direction: column; }
+.area-tarjeta > .card { flex: 1 0 auto; }
+
+.audio {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  margin-top: 16px;
+  padding: 0;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: none;
+  color: var(--acento);
+}
+.audio svg { width: 22px; height: 22px; }
+
+.pie { padding: 10px 12px 12px; border-top: 1px solid var(--linea); }
+.mostrar {
+  width: 100%;
+  padding: 15px;
+  border: none;
+  border-radius: 12px;
+  background: var(--azul);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.respuestas {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+  padding: 10px 12px 12px;
+  border-top: 1px solid var(--linea);
+}
+.respuestas button {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 9px 2px;
+  font-size: 15px;
+  font-weight: 650;
+  background: var(--panel);
+  border: 1px solid var(--linea);
+  border-radius: 12px;
+}
+.respuestas small { font-size: 12px; font-weight: 400; color: var(--suave); }
+.r1 { color: var(--rojo) !important; }
+.r2 { color: var(--naranja) !important; }
+.r3 { color: var(--verde) !important; }
+.r4 { color: var(--azul) !important; }
+
+/* ---------- fin */
+.fin { max-width: 420px; margin: 0 auto; padding: 56px 24px; text-align: center; }
+.fin h2 { margin: 12px 0 6px; }
+.fin p { color: var(--suave); }
+.fin-icono {
+  display: inline-flex;
+  padding: 14px;
+  border-radius: 999px;
+  background: var(--panel);
+  border: 1px solid var(--linea);
+  color: var(--verde);
+}
+.fin-icono svg { width: 36px; height: 36px; }
+
+.boton {
+  display: block;
+  width: 100%;
+  margin-top: 12px;
+  padding: 14px;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 600;
+  border: none;
+  border-radius: 12px;
+  background: var(--azul);
+  color: #fff;
+}
+.boton.secundario { background: var(--panel); color: var(--azul); border: 1px solid var(--linea); }
+.boton.peligro { background: var(--panel); color: var(--rojo); border: 1px solid var(--linea); }
+
+/* ---------- ajustes */
+.ajustes h2 { margin: 28px 0 4px; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--suave); }
+.fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  margin-bottom: 8px;
+  font-size: 16px;
+  background: var(--panel);
+  border: 1px solid var(--linea);
+  border-radius: 12px;
+}
+.fila input[type="number"] {
+  width: 76px;
+  padding: 6px 8px;
+  font: inherit;
+  text-align: center;
+  color: var(--texto);
+  background: var(--fondo);
+  border: 1px solid var(--linea);
+  border-radius: 8px;
+}
+.fila input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--azul); }
+
+.aviso {
+  position: fixed;
+  left: 50%;
+  bottom: calc(90px + env(safe-area-inset-bottom));
+  transform: translateX(-50%);
+  max-width: 90vw;
+  padding: 10px 16px;
+  font-size: 15px;
+  color: #fff;
+  background: rgba(30, 30, 30, .92);
+  border-radius: 999px;
+  pointer-events: none;
+}

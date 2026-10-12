@@ -1,0 +1,5 @@
+# Configuración del mazo. Usa :: en el nombre para crear submazos.
+nombre: Inglés::01 Modals
+idioma: inglés
+voz: en_US
+descripcion: Verbos modales (can, could, may, might, must, have to, should, would…): significado, completar, elegir, traducir, reescribir y errores típicos.

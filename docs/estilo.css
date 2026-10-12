@@ -1,0 +1,80 @@
+/* Estilo de todas las tarjetas. Cambia los colores aquí y vuelve a generar. */
+.card {
+  --fondo: #fafaf7;
+  --texto: #1f2328;
+  --suave: #6b7280;
+  --acento: #2563eb;
+  --acento-fondo: #e8efff;
+  --caja: #f1f1ec;
+  --borde: #dcdcd5;
+
+  font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 20px;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--texto);
+  background: var(--fondo);
+  padding: 24px 16px;
+}
+
+/* Modo noche de Anki */
+.card.nightMode, .card.night_mode {
+  --fondo: #1e1f22;
+  --texto: #e6e6e6;
+  --suave: #9aa0a6;
+  --acento: #7aa2ff;
+  --acento-fondo: #25304a;
+  --caja: #2a2b2f;
+  --borde: #3a3b40;
+}
+
+.wrap { max-width: 640px; margin: 0 auto; }
+
+.tipo {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--acento);
+  background: var(--acento-fondo);
+  padding: 3px 12px;
+  border-radius: 999px;
+  margin-bottom: 18px;
+}
+
+.en, .pregunta { font-size: 26px; font-weight: 500; }
+.termino { font-size: 34px; font-weight: 700; color: var(--acento); }
+.uso { font-size: 20px; font-weight: 600; margin-top: 6px; }
+.es { font-size: 19px; margin-top: 4px; }
+.trad { font-size: 18px; font-style: italic; color: var(--suave); margin-top: 8px; }
+.pista { font-size: 16px; color: var(--suave); margin-top: 10px; }
+
+.chips { margin-top: 14px; }
+.chip {
+  display: inline-block;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  padding: 4px 14px;
+  margin: 4px;
+  font-size: 18px;
+}
+
+.nota {
+  text-align: left;
+  font-size: 16px;
+  background: var(--caja);
+  border-left: 3px solid var(--acento);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-top: 18px;
+}
+
+b, .cloze { color: var(--acento); font-weight: 700; }
+s { color: var(--suave); }
+
+hr#answer {
+  border: none;
+  border-top: 1px solid var(--borde);
+  margin: 20px 0;
+}
