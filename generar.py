@@ -37,6 +37,7 @@ TIPOS = {
     "transformar.csv": ("pregunta", "Reescríbelo usando la palabra indicada"),
     "ordenar.csv": ("pregunta", "Ordena las palabras"),
     "errores.csv": ("pregunta", "Encuentra y corrige el error"),
+    "ejercicios.csv": ("ejercicio", None),
 }
 
 # Columnas de cada tipo. "etiquetas" es opcional en todos.
@@ -45,6 +46,7 @@ COLUMNAS = {
     "palabra": ["palabra", "tipo", "significado", "ejemplo", "traduccion", "nota"],
     "completar": ["oracion", "pista", "traduccion", "explicacion"],
     "pregunta": ["pregunta", "pista", "respuesta", "explicacion"],
+    "ejercicio": ["tema", "consigna", "frase", "respuesta", "porque", "error", "audio"],
 }
 # Columnas que identifican cada nota: si las cambias, Anki la importará como nota nueva.
 CLAVE = {
@@ -52,12 +54,14 @@ CLAVE = {
     "palabra": ["palabra", "tipo"],
     "completar": ["oracion"],
     "pregunta": ["pregunta"],
+    "ejercicio": ["consigna", "frase"],
 }
 OBLIGATORIAS = {
     "concepto": {"termino", "ejemplo"},
     "palabra": {"palabra", "significado"},
     "completar": {"oracion"},
     "pregunta": {"pregunta", "respuesta"},
+    "ejercicio": {"consigna", "frase", "respuesta"},
 }
 
 
@@ -170,6 +174,23 @@ PREGUNTA_DORSO = """<div class="wrap">
 {{tts VOZ:Respuesta}}
 </div>"""
 
+EJERCICIO_FRENTE = """<div class="wrap">
+{{#Tema}}<div class="tipo">{{Tema}}</div>{{/Tema}}
+{{#Consigna}}<div class="consigna">{{Consigna}}</div>{{/Consigna}}
+<div class="pregunta">{{Frase}}</div>
+</div>"""
+
+EJERCICIO_DORSO = """<div class="wrap">
+{{#Tema}}<div class="tipo">{{Tema}}</div>{{/Tema}}
+{{#Consigna}}<div class="consigna">{{Consigna}}</div>{{/Consigna}}
+<div class="pregunta">{{Frase}}</div>
+<hr id="answer">
+<div class="en">{{Respuesta}}</div>
+{{#PorQue}}<div class="nota">{{PorQue}}</div>{{/PorQue}}
+{{#Error}}<div class="nota error">⚠ {{Error}}</div>{{/Error}}
+{{#Audio}}{{tts VOZ:Audio}}{{/Audio}}
+</div>"""
+
 
 MODELOS = {
     "concepto": {
@@ -200,6 +221,12 @@ MODELOS = {
         "nombre": "Idiomas - Pregunta",
         "campos": ["Instruccion", "Pregunta", "Pista", "Respuesta", "Explicacion"],
         "plantillas": [{"nombre": "Pregunta", "frente": PREGUNTA_FRENTE, "dorso": PREGUNTA_DORSO}],
+        "cloze": False,
+    },
+    "ejercicio": {
+        "nombre": "Idiomas - Ejercicio",
+        "campos": ["Tema", "Consigna", "Frase", "Respuesta", "PorQue", "Error", "Audio"],
+        "plantillas": [{"nombre": "Ejercicio", "frente": EJERCICIO_FRENTE, "dorso": EJERCICIO_DORSO}],
         "cloze": False,
     },
 }
@@ -250,6 +277,10 @@ def campos(tipo, fila, instruccion):
         return [c["palabra"], c["tipo"], c["significado"], c["ejemplo"], c["traduccion"], c["nota"]]
     if tipo == "completar":
         return [a_cloze(c["oracion"]), c["pista"], c["traduccion"], c["explicacion"]]
+    if tipo == "ejercicio":
+        # audio = "no" en el CSV cuando la respuesta está en español
+        audio = "" if c["audio"].lower() == "no" else c["respuesta"]
+        return [c["tema"], c["consigna"], c["frase"], c["respuesta"], c["porque"], c["error"], audio]
     return [instruccion, c["pregunta"], chips(c["pista"]), c["respuesta"], c["explicacion"]]
 
 
@@ -290,8 +321,7 @@ def leer_bloque(carpeta):
                 sys.exit(f"{ruta}: faltan las columnas {', '.join(sorted(faltan))}")
             for linea, fila in enumerate(lector, start=2):
                 fila = {k: (v or "").strip() for k, v in fila.items() if isinstance(k, str)}
-                primera = fila.get(COLUMNAS[tipo][0], "")
-                if not primera or primera.startswith("#"):
+                if fila.get(COLUMNAS[tipo][0], "").startswith("#") or not any(fila.get(k) for k in CLAVE[tipo]):
                     continue
                 valores = campos(tipo, fila, instruccion)
                 if tipo == "completar" and "{{c" not in valores[0]:

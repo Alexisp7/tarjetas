@@ -1,0 +1,5 @@
+# Configuración del mazo. Usa :: en el nombre para crear submazos.
+nombre: Inglés::02 Unidades 3 y 4
+idioma: inglés
+voz: en_US
+descripcion: Importado de Ingles_100_Anki.tsv

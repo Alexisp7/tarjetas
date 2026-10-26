@@ -7,6 +7,7 @@
   --acento-fondo: #e8efff;
   --caja: #f1f1ec;
   --borde: #dcdcd5;
+  --aviso: #d9480f;
 
   font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
   font-size: 20px;
@@ -26,6 +27,7 @@
   --acento-fondo: #25304a;
   --caja: #2a2b2f;
   --borde: #3a3b40;
+  --aviso: #ff8a5c;
 }
 
 .wrap { max-width: 640px; margin: 0 auto; }
@@ -50,6 +52,7 @@
 .trad { font-size: 18px; font-style: italic; color: var(--suave); margin-top: 8px; }
 .pista { font-size: 16px; color: var(--suave); margin-top: 10px; }
 .ejemplo { font-size: 20px; margin-top: 14px; }
+.consigna { font-size: 17px; color: var(--suave); margin-bottom: 10px; }
 
 .chips { margin-top: 14px; }
 .chip {
@@ -70,6 +73,7 @@
   padding: 10px 14px;
   margin-top: 18px;
 }
+.nota.error { border-left-color: var(--aviso); margin-top: 10px; }
 
 b, .cloze { color: var(--acento); font-weight: 700; }
 s { color: var(--suave); }

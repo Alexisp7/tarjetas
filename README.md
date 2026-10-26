@@ -49,9 +49,22 @@ En cualquier campo: `**negrita**` y `~~tachado~~`. Columna opcional `etiquetas` 
 | `traducir.csv`    | (igual que elegir)                                     | pregunta           | 1                            |
 | `transformar.csv` | (igual que elegir)                                     | pregunta           | 1                            |
 | `errores.csv`     | (igual que elegir)                                     | pregunta           | 1                            |
+| `ordenar.csv`     | (igual que elegir)                                     | pregunta           | 1                            |
+| `palabras.csv`    | palabra; tipo; significado; ejemplo; traduccion; nota  | palabra + tipo     | 2: reconocer y producir      |
+| `ejercicios.csv`  | tema; consigna; frase; respuesta; porque; error; audio | consigna + frase   | 1                            |
 
 - **completar**: el hueco va entre corchetes: `You [must] go.`  También vale la sintaxis de Anki `{{c1::must}}` y `{{c2::...}}` para varias tarjetas.
 - **elegir / transformar**: en `pista` van las opciones separadas por `/` (salen como botones).
 - El audio usa la voz del sistema (`voz: en_US` en `mazo.txt`), sin archivos de audio.
 
 Para un bloque nuevo: copia la carpeta `01_modals`, cambia `mazo.txt` y los CSV.
+
+## Importar un .tsv de Anki (frente / reverso / etiquetas)
+
+```
+python importar_tsv.py Ingles_100_Anki.tsv ingles/02_unidades_3_y_4 "Inglés::02 Unidades 3 y 4"
+python generar.py
+```
+
+Crea la carpeta con `mazo.txt` y `ejercicios.csv`. Separa la consigna de la frase, resalta lo que
+rellena cada `___` y pone `audio = no` en las preguntas que se responden en español.
